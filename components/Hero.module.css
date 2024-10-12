@@ -1,0 +1,22 @@
+@font-face {
+    font-family: 'laperutaflf';
+    src: url('/assets/fonts/laperutaflf.ttf');
+    font-weight: 400;
+    font-style: normal;
+}
+
+.hero {
+    font-family: 'laperutaflf';
+}
+
+.heroImg {
+    width: 100px;
+    border-radius: .75rem;
+}
+
+.title {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    line-height: 1.375;
+    font-weight: 700;
+}
