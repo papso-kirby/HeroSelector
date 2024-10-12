@@ -19,6 +19,14 @@
   font-style: normal;
 }
 
+
+.work-sans-A {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
 html,
 body {
   background-color: #f8fafc;
@@ -59,6 +67,34 @@ code {
 }
 
 .selectorBox {
+  padding: 1em;
   height: 70vh;
   overflow: scroll;
+}
+
+.actionBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px;
+}
+
+.clickable {
+  border-top-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  background-color: #d4af37;
+  border-bottom-left-radius: 3px;
+  border-top-right-radius: 3px;
+  cursor: pointer;
+  padding: 1em;
+  transition: 0.3s;
+}
+
+.clickable:hover {
+  background-color: #e5cf87;
+  border-top-left-radius: 3px;
+  border-bottom-right-radius: 3px;
 }

@@ -17,6 +17,7 @@
 
 .selected {
     filter: none;
+    box-shadow: 0px 0px 10px 15px #ddbf5f;
 }
 
 .title {
