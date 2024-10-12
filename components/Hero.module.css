@@ -1,17 +1,22 @@
-@font-face {
-    font-family: 'laperutaflf';
-    src: url('/assets/fonts/laperutaflf.ttf');
-    font-weight: 400;
-    font-style: normal;
-}
-
 .hero {
-    font-family: 'laperutaflf';
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .heroImg {
-    width: 100px;
+    width: 264px;
     border-radius: .75rem;
+    filter: grayscale(1);
+    cursor: pointer;
+}
+
+.heroImg:hover {
+    filter: none;
+}
+
+.selected {
+    filter: none;
 }
 
 .title {

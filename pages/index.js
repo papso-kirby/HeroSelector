@@ -12,20 +12,24 @@ export default function Home() {
       </Head>
 
       <main>
-        <Header title="Ban My Hero" />
-        
-        <HeroSelector />
 
-        <p className="description">
-          
-        </p>
+        <div class="headerBox">
+          <Header title="Ban My Hero" />
+        </div>
 
+        <div class="selectorBox">
+          <HeroSelector />
+        </div>
 
         <form action="posi" method="post">
-          <label for="in">Test</label>
-          <input id="in">
-          </input>
-          <button>CLICK!</button>
+
+        <p>
+          <h3>Select your 3 Heros!</h3>
+        </p>
+        <p>
+          Your heros:
+        </p>
+          <button>Save</button>
         </form>
       </main>
 

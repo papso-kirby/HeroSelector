@@ -1,4 +1,11 @@
+.heros {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .heroLine {
     display: flex;
     flex-direction: row;
+    gap: 10px
 }
