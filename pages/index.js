@@ -1,59 +1,96 @@
 
 import HeroSelector from '@components/HeroSelector'
 import Base from '@components/Base'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation'
 
 export default function Home() {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedImages, setSelectedImages] = useState(new Set());
 
-  const [selectedImages, setSelectedImages] = useState(new Set());
+    const onToggle = (selected) => setSelectedImages(selected)
 
-  const toggleSelected = (selected) => {
-    setSelectedImages(selected);
-  }
+    const searchParams = useSearchParams();
+    const session = searchParams.get('session');
+    const playerKey = searchParams.get('player');
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    const heros = [...selectedImages];
-    try {
-      const response = await fetch('/create', {
-        method: 'POST',
-        body: JSON.stringify({
-          hero1: heros[0],
-          hero2: heros[1],
-          hero3: heros[2]
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    useEffect(() => {
+        if (session) {
+            fetch(`/get/${session}`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    setData(data.data);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    setError(err.message);
+                    setLoading(false);
+                });
+        } else {
+            setLoading(false);
+        }
+    }, [session]);
 
-      const json = await response.json();
-      window.location.href = `/selection?session=${json.data.id}&player=${json.data.keyA}`;
-    } catch (error) {
-      console.error('Form submission failed:', error);
+    async function handleSubmit(e, playerB) {
+        e.preventDefault();
+        const heros = [...selectedImages];
+        try {
+            const response = await fetch(playerB ? `/join/${session}`  : '/create', {
+                method: 'POST',
+                body: JSON.stringify({
+                    hero1: heros[0],
+                    hero2: heros[1],
+                    hero3: heros[2]
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const json = await response.json();
+            window.location.href = `/selection?session=${json.data.id}&player=${playerB ? json.data.keyB : json.data.keyA}`;
+        } catch (error) {
+            console.error('Form submission failed:', error);
+        }
     }
-  }
 
-  return (<Base>
-    <div>
-      <div className="selectorBox">
-        <HeroSelector onToggle={toggleSelected}/>
-      </div>
+    if (loading) return <Base><p>Loading...</p></Base>;
+    if (error) return <Base><p>Error: {error}</p></Base>;
+    if (session && !data) return <Base><p>Processing...</p></Base>;
 
-      <form className="actionBox" method="post" id="createForm" onSubmit={handleSubmit}>
+    const json = JSON.parse(data ?? '{}');
+    const playerB = playerKey === json.keyB;
+    const headline = playerB
+    ? "You are invited to choose your Heroes!"
+    : "Start a new round of Hero banning!"
 
-        <h3>Select your 3 Heros!</h3>
+    return (<Base>
+        <h3>{headline}</h3>
 
-
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-          Your heros:
-          {[...selectedImages].map(i => <div key={i}> {i} </div>)}
+        <div className="selectorBox">
+            <HeroSelector onToggle={onToggle} />
         </div>
 
-        <hr></hr>
+        <form className="actionBox" method="post" id="createForm" onSubmit={(e) => handleSubmit(e, playerB)}>
 
-        <button disabled={selectedImages.size !== 3} className='clickable work-sans-A' type='submit'>SELECT AND PROCEED</button>
-      </form>
-    </div>
-  </Base>);
+            <h3>Select your 3 Heros!</h3>
+
+
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                Your heros:
+                {[...selectedImages].map(i => <div key={i}> {i} </div>)}
+            </div>
+
+            <hr></hr>
+
+            <button disabled={selectedImages.size !== 3} className='clickable work-sans-A' type='submit'>SELECT AND PROCEED</button>
+        </form>
+    </Base>);
 }

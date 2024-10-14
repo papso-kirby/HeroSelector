@@ -23,13 +23,12 @@ const allHeros = {
 };
 
 export default function HeroLine({heros, selectedImages, onToggle}) {
-    console.log(heros)
     return (
         <div className={styles.heroLine}>
             {heros.map((h) =>
             <Hero
                 key={h}
-                src={allHeros[h]}
+                src={allHeros[h] ?? 'https://www.altered.gg/card-back.jpg'}
                 name={h}
                 isSelected={selectedImages && selectedImages.has(h)}
                 readonly={selectedImages==null}
