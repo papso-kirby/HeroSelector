@@ -27,6 +27,16 @@
   font-style: normal;
 }
 
+button, input[type="submit"], input[type="reset"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
 html,
 body {
   background-color: #f8fafc;
@@ -69,7 +79,7 @@ code {
 .selectorBox {
   padding: 1em;
   height: 70vh;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .actionBox {
@@ -97,4 +107,16 @@ code {
   background-color: #e5cf87;
   border-top-left-radius: 3px;
   border-bottom-right-radius: 3px;
+}
+
+.clickable:disabled {
+  background-color: #3a3a3a;
+  border-top-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

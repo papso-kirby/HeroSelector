@@ -1,7 +1,6 @@
-import Head from 'next/head'
-import Header from '@components/Header'
-import Footer from '@components/Footer'
+
 import HeroSelector from '@components/HeroSelector'
+import Base from '@components/Base'
 import React, { useState } from 'react';
 
 export default function Home() {
@@ -9,46 +8,52 @@ export default function Home() {
   const [selectedImages, setSelectedImages] = useState(new Set());
 
   const toggleSelected = (selected) => {
-    console.log(selected);
     setSelectedImages(selected);
   }
 
-  return (
-    <div className="container">
-      <Head>
-        <title>Ban My Hero!</title>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"></link>
-      </Head>
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const heros = [...selectedImages];
+    try {
+      const response = await fetch('/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          hero1: heros[0],
+          hero2: heros[1],
+          hero3: heros[2]
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      <main>
+      const json = await response.json();
+      window.location.href = `/selection?session=${json.data.id}&player=${json.data.keyA}`;
+    } catch (error) {
+      console.error('Form submission failed:', error);
+    }
+  }
 
-        <div className="headerBox">
-          <Header title="Ban My Hero" />
+  return (<Base>
+    <div>
+      <div className="selectorBox">
+        <HeroSelector onToggle={toggleSelected}/>
+      </div>
+
+      <form className="actionBox" method="post" id="createForm" onSubmit={handleSubmit}>
+
+        <h3>Select your 3 Heros!</h3>
+
+
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+          Your heros:
+          {[...selectedImages].map(i => <div key={i}> {i} </div>)}
         </div>
 
-        <div className="selectorBox">
-          <HeroSelector onToggle={toggleSelected} />
-        </div>
+        <hr></hr>
 
-        <form className="actionBox" action="posi" method="post">
-
-          <h3>Select your 3 Heros!</h3>
-
-
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-            Your heros:
-            {[...selectedImages].map(i => <div> {i} </div>)}
-          </div>
-
-          <hr></hr>
-
-          <div className='clickable work-sans-A'>SELECT AND PROCEED</div>
-        </form>
-      </main>
-
-      <Footer />
+        <button disabled={selectedImages.size !== 3} className='clickable work-sans-A' type='submit'>SELECT AND PROCEED</button>
+      </form>
     </div>
-  )
+  </Base>);
 }

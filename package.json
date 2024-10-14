@@ -9,6 +9,8 @@
     "export": "next build && next export"
   },
   "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "@netlify/functions": "^2.8.2",
     "@netlify/plugin-nextjs": "^5.7.4",
     "next": "^14.2.0",
     "react": "^18.2.0",
