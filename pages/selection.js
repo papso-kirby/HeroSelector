@@ -105,7 +105,7 @@ export default function CreateNew() {
 
     const playerA = playerKey === json.keyA;
 
-    const playerBlink = `${protocol}//${host}:${port}?session=${json.id}&player=${json.keyB}`;
+    const playerBlink = `${protocol}//${host}:${port.replace(':80', '')}?session=${json.id}&player=${json.keyB}`;
 
     const aBansB = json.heroB1
         ? <>
