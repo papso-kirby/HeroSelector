@@ -1,16 +1,6 @@
 import { getStore } from "@netlify/blobs";
 
-function generateRandomString(length = 8) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-  }
-
 export default async function handler(request, context) {
-    console.log("Received form data:");
     try {
         if (request.method !== "POST") {
             return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
@@ -19,30 +9,21 @@ export default async function handler(request, context) {
             });
         }
 
+        const { sessionID } = context.params;
         const payload = await request.json();
-
-        console.log("Received form data:", payload);
-
         const sessions = getStore("sessions");
-        const session = {
-            id: generateRandomString(),
-            keyA: generateRandomString(4),
-            keyB: generateRandomString(4),
-            heroA1: payload.hero1,
-            heroA2: payload.hero2,
-            heroA3: payload.hero3,
-            heroB1: undefined,
-            heroB2: undefined,
-            heroB3: undefined,
-            ban1: undefined,
-            ban2: undefined
-        };
+        const session = JSON.parse(await sessions.get(sessionID, 'json'));
+
+        if (payload.playerKey == session.keyA)
+            session.ban1 = payload.hero;
+        else
+            session.ban2 = payload.hero;
 
         await sessions.setJSON(session.id, session);
 
         return new Response(
             JSON.stringify({
-                message: "Session created",
+                message: "Hero banned",
                 data: session
             }), {
             statusCode: 200,
@@ -61,5 +42,5 @@ export default async function handler(request, context) {
 }
 
 export const config = {
-    path: "/create"
+    path: "/ban/:sessionID"
 };

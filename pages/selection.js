@@ -90,6 +90,28 @@ export default function CreateNew() {
     if (error) return <Base><p>Error: {error}</p></Base>;
     if (!data) return <Base><p>Processing...</p></Base>;
 
+    async function handleSubmit(e, playerB) {
+        e.preventDefault();
+        const heroToBan = [...selectedImages][0];
+        try {
+            const response = await fetch(`/ban/${session}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    playerKey: playerKey,
+                    hero: heroToBan,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const json = await response.json();
+            window.location.href = `/result?session=${json.data.id}&player=${playerB ? json.data.keyB : json.data.keyA}`;
+        } catch (error) {
+            console.error('Form submission failed:', error);
+        }
+    }
+
     const toggleImage = (name) => {
         const newSelectedImages = new Set(selectedImages);
 
@@ -102,11 +124,12 @@ export default function CreateNew() {
         setSelectedImages(newSelectedImages);
     };
 
-    const json = JSON.parse(data);
-    const heroesA = [json.heroA1, json.heroA2, json.heroA3];
-    const heroesB = [json.heroB1, json.heroB2, json.heroB3];
+    const state = JSON.parse(data);
+    const heroesA = [state.heroA1, state.heroA2, state.heroA3];
+    const heroesB = [state.heroB1, state.heroB2, state.heroB3];
 
-    const playerA = playerKey === json.keyA;
+    const playerA = playerKey === state.keyA;
+    const playerB = !playerA;
 
     const OuterPage = ({ headerContent, children }) => {
         return (<Base>
@@ -116,23 +139,24 @@ export default function CreateNew() {
                 {children}
                 <Spacer />
                 <Spacer />
-                <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
+                <form className="actionBox" method="post" id="banForm" onSubmit={(e) => handleSubmit(e, playerB)}>
+                    <h3>Select a Hero to ban</h3>
+                    <Spacer />
+                    <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
+                </form>
             </div>
         </Base>)
     }
 
     if (playerA) {
-        const playerBlink = `${protocol}//${host}:${port}?session=${json.id}&player=${json.keyB}`.replace(':80', '');
-        const playerBhasHeroesSelected = !!json.heroB1;
+        const playerBlink = `${protocol}//${host}:${port}?session=${state.id}&player=${state.keyB}`.replace(':80', '');
+        const playerBhasHeroesSelected = !!state.heroB1;
 
         return (
             <OuterPage headerContent={<OpponentLink link={playerBlink} />}>
                 {playerBhasHeroesSelected
                     ? <>
                         <HeroLine heroes={heroesB} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
-                        <Spacer />
-                        <Spacer />
-                        Select a Hero to ban
                     </>
                     : <>
                         Please wait for your opponent to select their heroes...
@@ -145,8 +169,5 @@ export default function CreateNew() {
     return (
         <OuterPage>
             <HeroLine heroes={heroesA} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
-            <Spacer />
-            <Spacer />
-            Select a Hero to ban!
         </OuterPage>)
 }

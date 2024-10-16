@@ -11,17 +11,13 @@ export default async function handler(request, context) {
         }
 
         const { sessionID } = context.params;
-
-        const formData = await request.json();
-
-        console.log("Received form data:", formData);
-
+        const payload = await request.json();
         const sessions = getStore("sessions");
         const session = JSON.parse(await sessions.get(sessionID, 'json'));
 
-        session.heroB1 = formData.hero1;
-        session.heroB2 = formData.hero2;
-        session.heroB3 = formData.hero3;
+        session.heroB1 = payload.hero1;
+        session.heroB2 = payload.hero2;
+        session.heroB3 = payload.hero3;
 
         await sessions.setJSON(session.id, session);
 

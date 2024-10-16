@@ -22,7 +22,7 @@ const allHeroes = {
         'Lindiwe & Maw': "https://altered-prod-eu.s3.amazonaws.com/Art/COREKS/CARDS/ALT_CORE_B_YZ_02/JPG/en_US/8d1c2d0d672092300fb67eee05e2ab9a.jpg",
 };
 
-export default function HeroLine({heroes, selectedImages, onToggle}) {
+export default function HeroLine({heroes, selectedImages, onToggle, banned}) {
     return (
         <div className={styles.heroLine}>
             {heroes.map((h) =>
@@ -33,6 +33,7 @@ export default function HeroLine({heroes, selectedImages, onToggle}) {
                 isSelected={selectedImages && selectedImages.has(h)}
                 readonly={selectedImages==null}
                 onToggle={onToggle}
+                banned={h === banned}
             />)}
         </div>
     )

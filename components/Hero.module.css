@@ -8,11 +8,11 @@
     width: 264px;
     border-radius: .75rem;
     filter: grayscale(1);
-    cursor: pointer;
 }
 
-.heroImg:hover {
+.unbanned:hover {
     filter: none;
+    cursor: pointer;
 }
 
 .readonly {
