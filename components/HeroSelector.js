@@ -18,7 +18,7 @@ export default function HeroSelector(onToggle) {
         onToggle.onToggle(newSelectedImages);
     };
 
-    const heros = [
+    const heroes = [
         [
             'Sierra & Oddball',
             'Subhash & Marmo',
@@ -52,9 +52,9 @@ export default function HeroSelector(onToggle) {
     ];
 
     return (<>
-        <div className={styles.heros}>
-            {heros.map((line) =>
-                <HeroLine heros={line} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
+        <div className={styles.heroes}>
+            {heroes.map((line) =>
+                <HeroLine heroes={line} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
             )}
         </div>
     </>)

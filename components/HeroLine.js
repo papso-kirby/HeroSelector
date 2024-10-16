@@ -1,7 +1,7 @@
 import Hero from '@components/Hero'
 import styles from './HeroLine.module.css'
 
-const allHeros = {
+const allHeroes = {
         'Sierra & Oddball': 'https://altered-prod-eu.s3.amazonaws.com/Art/COREKS/CARDS/ALT_CORE_B_AX_01/JPG/en_US/6958dcd407c29a6fab4130f6dca88d2b.jpg',
         'Subhash & Marmo': 'https://altered-prod-eu.s3.amazonaws.com/Art/COREKS/CARDS/ALT_CORE_B_AX_03/JPG/en_US/b2d43252d9edb7b98a1cfe6c365ad0fa.jpg',
         'Treyst & Rossum': 'https://altered-prod-eu.s3.amazonaws.com/Art/COREKS/CARDS/ALT_CORE_B_AX_02/JPG/en_US/0a282a089b3d451d4f520e8e90853fc2.jpg', 
@@ -22,13 +22,13 @@ const allHeros = {
         'Lindiwe & Maw': "https://altered-prod-eu.s3.amazonaws.com/Art/COREKS/CARDS/ALT_CORE_B_YZ_02/JPG/en_US/8d1c2d0d672092300fb67eee05e2ab9a.jpg",
 };
 
-export default function HeroLine({heros, selectedImages, onToggle}) {
+export default function HeroLine({heroes, selectedImages, onToggle}) {
     return (
         <div className={styles.heroLine}>
-            {heros.map((h) =>
+            {heroes.map((h) =>
             <Hero
                 key={h}
-                src={allHeros[h] ?? 'https://www.altered.gg/card-back.jpg'}
+                src={allHeroes[h] ?? 'https://www.altered.gg/card-back.jpg'}
                 name={h}
                 isSelected={selectedImages && selectedImages.has(h)}
                 readonly={selectedImages==null}

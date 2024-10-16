@@ -1,6 +1,9 @@
-import Base from '@components/Base'
+import Base from '@components/Base';
 import HeroLine from '@components/HeroLine';
-import { useSearchParams } from 'next/navigation'
+import Spacer from '@components/Spacer';
+import OpponentLink from '@components/OpponentLink';
+
+import { useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 export default function CreateNew() {
@@ -100,63 +103,50 @@ export default function CreateNew() {
     };
 
     const json = JSON.parse(data);
-    const herosA = [json.heroA1, json.heroA2, json.heroA3];
-    const herosB = [json.heroB1, json.heroB2, json.heroB3];
+    const heroesA = [json.heroA1, json.heroA2, json.heroA3];
+    const heroesB = [json.heroB1, json.heroB2, json.heroB3];
 
     const playerA = playerKey === json.keyA;
 
-    const playerBlink = `${protocol}//${host}:${port}?session=${json.id}&player=${json.keyB}`.replace(':80', '');
+    const OuterPage = ({ headerContent, children }) => {
+        return (<Base>
+            <div className='flex-column'>
+                {headerContent}
+                <h1>Your Opponent's Heroes</h1>
+                {children}
+                <Spacer />
+                <Spacer />
+                <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
+            </div>
+        </Base>)
+    }
 
-
-    const aBansB = json.heroB1
-        ? <>
-            <HeroLine heros={herosB} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
-            <hr></hr>
-            <hr></hr>
-            Select a Hero to ban
-            <hr></hr>
-        </>
-        : <>
-            Please wait...
-            <HeroLine heros={herosB}></HeroLine>
-        </>
-
-
-
-    if (playerA)
+    if (playerA) {
+        const playerBlink = `${protocol}//${host}:${port}?session=${json.id}&player=${json.keyB}`.replace(':80', '');
+        const playerBhasHeroesSelected = !!json.heroB1;
 
         return (
-            <Base>
-                <div className='flex-column'>
-
-                    <span>Send this <a target='blank' href={playerBlink}>link</a> to your opponent and wait for them to select their heros.</span>
-                    <hr></hr>
-                    <button className='clickable work-sans-A' type='button' onClick={() => navigator.clipboard.writeText(playerBlink)}>COPY LINK</button>
-
-                    <h1>Your Opponent's Heros</h1>
-                    {aBansB}
-
-                    <hr></hr>
-                    <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
-
-                </div>
-            </Base>
+            <OuterPage headerContent={<OpponentLink link={playerBlink} />}>
+                {playerBhasHeroesSelected
+                    ? <>
+                        <HeroLine heroes={heroesB} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
+                        <Spacer />
+                        <Spacer />
+                        Select a Hero to ban
+                    </>
+                    : <>
+                        Please wait for your opponent to select their heroes...
+                        <HeroLine heroes={heroesB}></HeroLine>
+                    </>}
+            </OuterPage>
         );
+    }
+
     return (
-        <Base>
-            <div className='flex-column'>
-                <h1>Your Opponent's Heros</h1>
-                <HeroLine heros={herosA} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
-                <hr></hr>
-                <hr></hr>
-                Select a Hero to ban
-                <hr></hr>
-
-                <hr></hr>
-                <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
-
-            </div>
-        </Base>
-    )
-
+        <OuterPage>
+            <HeroLine heroes={heroesA} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
+            <Spacer />
+            <Spacer />
+            Select a Hero to ban!
+        </OuterPage>)
 }

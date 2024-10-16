@@ -1,8 +1,8 @@
-
-import HeroSelector from '@components/HeroSelector'
-import Base from '@components/Base'
+import HeroSelector from '@components/HeroSelector';
+import Spacer from '@components/Spacer';
+import Base from '@components/Base';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
     const [data, setData] = useState(null);
@@ -40,14 +40,14 @@ export default function Home() {
 
     async function handleSubmit(e, playerB) {
         e.preventDefault();
-        const heros = [...selectedImages];
+        const heroes = [...selectedImages];
         try {
             const response = await fetch(playerB ? `/join/${session}`  : '/create', {
                 method: 'POST',
                 body: JSON.stringify({
-                    hero1: heros[0],
-                    hero2: heros[1],
-                    hero3: heros[2]
+                    hero1: heroes[0],
+                    hero2: heroes[1],
+                    hero3: heroes[2]
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,15 +80,15 @@ export default function Home() {
 
         <form className="actionBox" method="post" id="createForm" onSubmit={(e) => handleSubmit(e, playerB)}>
 
-            <h3>Select your 3 Heros!</h3>
+            <h3>Select your 3 Heroes!</h3>
 
 
             <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                Your heros:
+                Your Heroes:
                 {[...selectedImages].map(i => <div key={i}> {i} </div>)}
             </div>
 
-            <hr></hr>
+            <Spacer />
 
             <button disabled={selectedImages.size !== 3} className='clickable work-sans-A' type='submit'>SELECT AND PROCEED</button>
         </form>

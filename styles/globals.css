@@ -19,6 +19,17 @@
   font-style: normal;
 }
 
+html,
+body {
+  background-color: #f8fafc;
+  padding: 0;
+  margin: 0;
+  font-family: tiller;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 .work-sans-A {
   font-family: "Work Sans", sans-serif;
@@ -37,38 +48,10 @@ button, input[type="submit"], input[type="reset"] {
 	outline: inherit;
 }
 
-html,
-body {
-  background-color: #f8fafc;
-  padding: 0;
-  margin: 0;
-  font-family: tiller;
-}
-
-* {
-  box-sizing: border-box;
-}
-
 main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  
-  align-items: center;
-}
-
-code {
-  background: #e2e8f0;
-  border-radius: 5px;
-  padding: 0.75rem;
-  font-family: Menlo, Monaco, Lucida Console, Courier New, monospace;
-}
-
-.container {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -79,7 +62,7 @@ code {
 .selectorBox {
   padding: 1em;
   height: 70vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .actionBox {
@@ -119,4 +102,9 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.spacer {
+  display: block;
+  height: 1em;
 }
