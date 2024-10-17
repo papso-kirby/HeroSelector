@@ -10,17 +10,11 @@ export default async function handler(request, context) {
         }
 
         const { id } = context.params;
-
-        console.log("Received id:", id);
-
         const sessions = getStore("sessions");
         const session = await sessions.get(id, 'json');
 
         return new Response(
-            JSON.stringify({
-                message: "Session loaded",
-                data: session
-            }), {
+            JSON.stringify(session), {
             statusCode: 200,
             headers: { "Content-Type": "application/json", }
         });
@@ -37,5 +31,5 @@ export default async function handler(request, context) {
 }
 
 export const config = {
-    path: "/get/:id"
+    path: "/sessions/:id"
 };

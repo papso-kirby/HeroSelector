@@ -6,63 +6,58 @@ import OpponentLink from '@components/OpponentLink';
 import { useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
+import { getSession } from '../services/apiService';
+
 export default function CreateNew() {
-    const [data, setData] = useState(null);
+    const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [host, setHost] = useState('');
-    const [port, setPort] = useState('');
-    const [protocol, setprotocol] = useState('');
+
+    const [url, setUrl] = useState(null);
+
     const [selectedImages, setSelectedImages] = useState(new Set());
     const [polling, setPolling] = useState(true);
+
     const searchParams = useSearchParams();
-    const session = searchParams.get('session');
+    const sessionID = searchParams.get('session');
     const playerKey = searchParams.get('player');
 
     useEffect(() => {
-        if (session) {
-            fetch(`/get/${session}`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Error: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    setData(data.data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+        const fetchSession = async () => {
+            try {
+                setSession(await getSession(sessionID));
+            } catch (err) {
+                setError(err.message);
+            }
+            setLoading(false);
+        };
+
+        console.log(sessionID);
+        if (sessionID) {
+            fetchSession();
         } else {
             setLoading(false);
         }
-    }, [session]);
+    }, [sessionID]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            setHost(window.location.hostname);
-            setPort(window.location.port || '80');
-            setprotocol(window.location.protocol);
+            const host = window.location.hostname;
+            const port = window.location.port || '80';
+            const protocol = window.location.protocol;
+            const url = `${protocol}//${host}:${port}`.replace(':80', '');
+            setUrl(url);
         }
     }, []);
 
     useEffect(() => {
-        if (session) {
+        if (sessionID) {
             let intervalId;
-            const fetchData = async () => {
+            const fetchSession = async () => {
                 try {
-                    const response = await fetch(`/get/${session}`);
-                    if (!response.ok) {
-                        console.log(`Error: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    const s = JSON.parse(result.data);
-                    if (s.heroB1) {
-                        setData(result.data);
+                    const session = await getSession(sessionID);
+                    if (session.heroB1) {
+                        setSession(session);
                         setPolling(false);
                         if (intervalId) {
                             clearInterval(intervalId);
@@ -76,25 +71,25 @@ export default function CreateNew() {
                     }
                 }
             };
-            intervalId = setInterval(fetchData, 5000);
-            fetchData();
+            intervalId = setInterval(fetchSession, 5000);
+            fetchSession();
             return () => {
                 if (intervalId) {
                     clearInterval(intervalId);
                 }
             };
         }
-    }, [session]);
+    }, [sessionID]);
 
     if (loading) return <Base><p>Loading...</p></Base>;
     if (error) return <Base><p>Error: {error}</p></Base>;
-    if (!data) return <Base><p>Processing...</p></Base>;
+    if (!session) return <Base><p>Processing...</p></Base>;
 
     async function handleSubmit(e, playerB) {
         e.preventDefault();
         const heroToBan = [...selectedImages][0];
         try {
-            const response = await fetch(`/ban/${session}`, {
+            const response = await fetch(`/ban/${sessionID}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     playerKey: playerKey,
@@ -124,11 +119,10 @@ export default function CreateNew() {
         setSelectedImages(newSelectedImages);
     };
 
-    const state = JSON.parse(data);
-    const heroesA = [state.heroA1, state.heroA2, state.heroA3];
-    const heroesB = [state.heroB1, state.heroB2, state.heroB3];
+    const heroesA = [session.heroA1, session.heroA2, session.heroA3];
+    const heroesB = [session.heroB1, session.heroB2, session.heroB3];
 
-    const playerA = playerKey === state.keyA;
+    const playerA = playerKey === session.keyA;
     const playerB = !playerA;
 
     const OuterPage = ({ headerContent, children }) => {
@@ -149,8 +143,8 @@ export default function CreateNew() {
     }
 
     if (playerA) {
-        const playerBlink = `${protocol}//${host}:${port}?session=${state.id}&player=${state.keyB}`.replace(':80', '');
-        const playerBhasHeroesSelected = !!state.heroB1;
+        const playerBlink = `${url}?session=${session.id}&player=${session.keyB}`;
+        const playerBhasHeroesSelected = !!session.heroB1;
 
         return (
             <OuterPage headerContent={<OpponentLink link={playerBlink} />}>

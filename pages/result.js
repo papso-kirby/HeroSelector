@@ -5,53 +5,46 @@ import Spacer from '@components/Spacer';
 import { useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
+import { getSession } from '../services/apiService';
+
 export default function Result() {
 
-    const [data, setData] = useState(null);
+    const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const searchParams = useSearchParams();
-    const session = searchParams.get('session');
+    const sessionID = searchParams.get('session');
     const [polling, setPolling] = useState(true);
     const playerKey = searchParams.get('player');
 
     useEffect(() => {
-        if (session) {
-            fetch(`/get/${session}`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Error: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    setData(data.data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+        const fetchSession = async () => {
+            try {
+                setSession(await getSession(sessionID));
+            } catch (err) {
+                setError(err.message);
+            }
+            setLoading(false);
+        };
+
+        console.log(sessionID);
+        if (sessionID) {
+            fetchSession();
         } else {
             setLoading(false);
         }
-    }, [session]);
+    }, [sessionID]);
 
     useEffect(() => {
-        if (session) {
+        if (sessionID) {
             let intervalId;
-            const fetchData = async () => {
+            const fetchSession = async () => {
                 try {
-                    const response = await fetch(`/get/${session}`);
-                    if (!response.ok) {
-                        console.log(`Error: ${response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    const s = JSON.parse(result.data);
-                    if (s.ban1 && s.ban2) {
-                        setData(result.data);
+                    const session = await getSession(sessionID);
+                    if (session.ban1 && session.ban2) {
+                        setSession(session);
+                        console.log(session)
                         setPolling(false);
                         if (intervalId) {
                             clearInterval(intervalId);
@@ -65,31 +58,30 @@ export default function Result() {
                     }
                 }
             };
-            intervalId = setInterval(fetchData, 5000);
-            fetchData();
+            intervalId = setInterval(fetchSession, 5000);
+            fetchSession();
             return () => {
                 if (intervalId) {
                     clearInterval(intervalId);
                 }
             };
         }
-    }, [session]);
+    }, [sessionID]);
 
     if (loading) return <Base><p>Waiting for results...</p></Base>;
     if (error) return <Base><p>Error: {error}</p></Base>;
-    if (!data) return <Base><p>Processing...</p></Base>;
+    if (!session) return <Base><p>Processing...</p></Base>;
     if (polling) return <Base><p>Waiting for results...</p></Base>;
 
-    const state = JSON.parse(data);
-    const playerA = playerKey === state.keyA;
-    const heroesA = [state.heroA1, state.heroA2, state.heroA3];
-    const heroesB = [state.heroB1, state.heroB2, state.heroB3];
+    const playerA = playerKey === session.keyA;
+    const heroesA = [session.heroA1, session.heroA2, session.heroA3];
+    const heroesB = [session.heroB1, session.heroB2, session.heroB3];
 
     return (<Base>
         <h3>Your heroes</h3>
-        <HeroLine heroes={playerA ? heroesA : heroesB} banned={playerA ? state.ban2 : state.ban1}></HeroLine>
+        <HeroLine heroes={playerA ? heroesA : heroesB} banned={playerA ? session.ban2 : session.ban1}></HeroLine>
         <Spacer />
         <h3>Your Opponent's heroes</h3>
-        <HeroLine heroes={playerA ? heroesB : heroesA} banned={playerA ? state.ban1 : state.ban2}></HeroLine>
+        <HeroLine heroes={playerA ? heroesB : heroesA} banned={playerA ? session.ban1 : session.ban2}></HeroLine>
     </Base>)
 }

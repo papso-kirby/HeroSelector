@@ -4,8 +4,10 @@ import Base from '@components/Base';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
+import { getSession } from '../services/apiService';
+
 export default function Home() {
-    const [data, setData] = useState(null);
+    const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedImages, setSelectedImages] = useState(new Set());
@@ -13,36 +15,31 @@ export default function Home() {
     const onToggle = (selected) => setSelectedImages(selected)
 
     const searchParams = useSearchParams();
-    const session = searchParams.get('session');
+    const sessionID = searchParams.get('session');
     const playerKey = searchParams.get('player');
 
     useEffect(() => {
-        if (session) {
-            fetch(`/get/${session}`)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Error: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    setData(data.data);
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
-                });
+        const fetchSession = async () => {
+            try {
+                setSession(await getSession(sessionID));
+            } catch (err) {
+                setError(err.message);
+            }
+            setLoading(false);
+        };
+
+        if (sessionID) {
+            fetchSession();
         } else {
             setLoading(false);
         }
-    }, [session]);
+    }, [sessionID]);
 
     async function handleSubmit(e, playerB) {
         e.preventDefault();
         const heroes = [...selectedImages];
         try {
-            const response = await fetch(playerB ? `/join/${session}`  : '/create', {
+            const response = await fetch(playerB ? `/join/${sessionID}`  : '/create', {
                 method: 'POST',
                 body: JSON.stringify({
                     hero1: heroes[0],
@@ -63,10 +60,9 @@ export default function Home() {
 
     if (loading) return <Base><p>Loading...</p></Base>;
     if (error) return <Base><p>Error: {error}</p></Base>;
-    if (session && !data) return <Base><p>Processing...</p></Base>;
+    if (sessionID && !session) return <Base><p>Processing...</p></Base>;
 
-    const json = JSON.parse(data ?? '{}');
-    const playerB = playerKey === json.keyB;
+    const playerB = playerKey === session?.keyB;
     const headline = playerB
     ? "You are invited to choose your Heroes!"
     : "Start a new round of Hero banning!"
