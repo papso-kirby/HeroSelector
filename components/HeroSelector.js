@@ -1,4 +1,3 @@
-import styles from './HeroSelector.module.css'
 import React, { useState } from 'react';
 import HeroLine from '@components/HeroLine';
 
@@ -51,11 +50,5 @@ export default function HeroSelector(onToggle) {
         ]
     ];
 
-    return (<>
-        <div className={styles.heroes}>
-            {heroes.map((line) =>
-                <HeroLine heroes={line} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
-            )}
-        </div>
-    </>)
+    return (<HeroLine heroes={heroes.flat()} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>)
 }

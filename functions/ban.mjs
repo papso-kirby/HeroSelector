@@ -22,10 +22,7 @@ export default async function handler(request, context) {
         await sessions.setJSON(session.id, session);
 
         return new Response(
-            JSON.stringify({
-                message: "Hero banned",
-                data: session
-            }), {
+            JSON.stringify(session), {
             statusCode: 200,
             headers: { "Content-Type": "application/json", }
         });

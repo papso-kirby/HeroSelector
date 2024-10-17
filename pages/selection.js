@@ -1,4 +1,3 @@
-import Base from '@components/Base';
 import HeroLine from '@components/HeroLine';
 import Spacer from '@components/Spacer';
 import OpponentLink from '@components/OpponentLink';
@@ -7,11 +6,10 @@ import { useSearchParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 import { getSession } from '../services/apiService';
+import { postData } from 'services/apiService';
+import sessionEffect from '../shared/effects';
 
 export default function CreateNew() {
-    const [session, setSession] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     const [url, setUrl] = useState(null);
 
@@ -22,23 +20,7 @@ export default function CreateNew() {
     const sessionID = searchParams.get('session');
     const playerKey = searchParams.get('player');
 
-    useEffect(() => {
-        const fetchSession = async () => {
-            try {
-                setSession(await getSession(sessionID));
-            } catch (err) {
-                setError(err.message);
-            }
-            setLoading(false);
-        };
-
-        console.log(sessionID);
-        if (sessionID) {
-            fetchSession();
-        } else {
-            setLoading(false);
-        }
-    }, [sessionID]);
+    const [session, loading, error, setSession, setLoading, setError] = sessionEffect(sessionID);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -81,26 +63,20 @@ export default function CreateNew() {
         }
     }, [sessionID]);
 
-    if (loading) return <Base><p>Loading...</p></Base>;
-    if (error) return <Base><p>Error: {error}</p></Base>;
-    if (!session) return <Base><p>Processing...</p></Base>;
+    if (loading) return <><p className='box'>Loading...</p></>;
+    if (error) return <><p className='box'>Error: {error}</p></>;
+    if (!session) return <><p className='box'>Processing...</p></>;
 
     async function handleSubmit(e, playerB) {
         e.preventDefault();
         const heroToBan = [...selectedImages][0];
         try {
-            const response = await fetch(`/ban/${sessionID}`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    playerKey: playerKey,
-                    hero: heroToBan,
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const json = await postData(`/ban/${sessionID}`, 
+            {
+                playerKey: playerKey,
+                hero: heroToBan,
             });
 
-            const json = await response.json();
             window.location.href = `/result?session=${json.data.id}&player=${playerB ? json.data.keyB : json.data.keyA}`;
         } catch (error) {
             console.error('Form submission failed:', error);
@@ -126,34 +102,34 @@ export default function CreateNew() {
     const playerB = !playerA;
 
     const OuterPage = ({ headerContent, children }) => {
-        return (<Base>
+        return (<>
             <div className='flex-column'>
                 {headerContent}
-                <h1>Your Opponent's Heroes</h1>
+                <h1 className='box'>Select a Hero to ban</h1>
+                <h2>Your Opponent's Heroes:</h2>
                 {children}
                 <Spacer />
                 <Spacer />
                 <form className="actionBox" method="post" id="banForm" onSubmit={(e) => handleSubmit(e, playerB)}>
-                    <h3>Select a Hero to ban</h3>
-                    <Spacer />
                     <button disabled={selectedImages.size != 1} className='clickable work-sans-A' type='submit'>SELECT AND BAN</button>
                 </form>
+                <Spacer />
+                <Spacer />
             </div>
-        </Base>)
+        </>)
     }
 
     if (playerA) {
         const playerBlink = `${url}?session=${session.id}&player=${session.keyB}`;
         const playerBhasHeroesSelected = !!session.heroB1;
-
         return (
-            <OuterPage headerContent={<OpponentLink link={playerBlink} />}>
+            <OuterPage headerContent={playerBhasHeroesSelected ? <></> : <OpponentLink link={playerBlink} />}>
                 {playerBhasHeroesSelected
                     ? <>
                         <HeroLine heroes={heroesB} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
                     </>
                     : <>
-                        Please wait for your opponent to select their heroes...
+                        <span className='margin-1'>Please wait for your opponent to select their heroes...</span>
                         <HeroLine heroes={heroesB}></HeroLine>
                     </>}
             </OuterPage>
