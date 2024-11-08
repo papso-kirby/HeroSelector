@@ -129,7 +129,7 @@ export default function CreateNew() {
                         <HeroLine heroes={heroesB} selectedImages={selectedImages} onToggle={toggleImage}></HeroLine>
                     </>
                     : <>
-                        <span className='margin-1'>Please wait for your opponent to select their heroes...</span>
+                        <span className='margin-1'>Please wait for your opponent to select their heroes. Do not close this tab.</span>
                         <HeroLine heroes={heroesB}></HeroLine>
                     </>}
             </OuterPage>

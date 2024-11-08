@@ -40,8 +40,8 @@ export default function Home() {
 
     const playerB = playerKey === session?.keyB;
     const headline = playerB
-    ? "You are invited to a round of Hero banning. Pick your Heroes!"
-    : "Start a new round of Hero banning by picking your Heroes!"
+    ? "You are invited to a round of Hero banning. Pick your Heroes, then proceed to the next step. Leave the tab open, until both players banned a hero."
+    : "Pick your 3 Heroes, then proceed to the next step. Leave the tab open, until both players banned a hero."
 
     return (<>
         <div className='flex-column' style={{ flex: 1, marginBottom: 40 }}>
