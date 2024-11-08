@@ -14,10 +14,16 @@ export default async function handler(request, context) {
         const sessions = getStore("sessions");
         const session = JSON.parse(await sessions.get(sessionID, 'json'));
 
-        if (payload.playerKey == session.keyA)
+        if (payload.hero && payload.playerKey == session.keyA)
             session.ban1 = payload.hero;
-        else
+        else if (payload.hero && payload.playerKey == session.keyB)
             session.ban2 = payload.hero;
+        else 
+            return new Response(
+                JSON.stringify(session), {
+                statusCode: 500,
+                headers: { "Content-Type": "application/json", }
+            });
 
         await sessions.setJSON(session.id, session);
 
